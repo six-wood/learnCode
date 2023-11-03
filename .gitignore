@@ -3,6 +3,10 @@
 ./drop_out_2d_test/__pycache__
 ./data
 transformer/checkpoint/detr_demo-da2a99e9.pth
+transformer/logs
+transformer/ViT/data
+transformer/ViT/logs
+transformer/data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

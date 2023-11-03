@@ -3,10 +3,12 @@ import torch
 import torch.nn as nn
 
 from labml_nn.utils import clone_module_list
-from labml_nn.transformers import Encoder, MultiHeadAttention
-from .feed_forward import FeedForward
-from .mha import MultiHeadAttention
-from .positional_encoding import get_positional_encodeing
+import feed_forward
+import mha
+import positional_encoding
+# from feed_forward import FeedForward
+# from mha import MultiHeadAttention
+# from positional_encoding import get_positional_encodeing
 
 
 class EmbeddingsWithPositionalEncoding(nn.Module):
@@ -14,8 +16,9 @@ class EmbeddingsWithPositionalEncoding(nn.Module):
         super().__init__()
         self.linear = nn.Embedding(n_vocab, d_model)
         self.d_model = d_model
+        
         self.register_buffer(
-            "positional_encodings", get_positional_encodeing(d_model, max_len)
+            "positional_encodings", positional_encoding.get_positional_encodeing(d_model, max_len)
         )
 
     def forward(self, x: torch.Tensor):
@@ -45,9 +48,9 @@ class TransformerLayer(nn.Module):
     def __init__(
         self,
         d_model: int,
-        self_attn: MultiHeadAttention,
-        src_attn: MultiHeadAttention,
-        feed_forward: FeedForward,
+        self_attn: mha.MultiHeadAttention,
+        src_attn: mha.MultiHeadAttention,
+        ff: feed_forward.FeedForward,
         dropout_prob: float,
     ) -> None:
         super().__init__()
@@ -68,7 +71,7 @@ class TransformerLayer(nn.Module):
         self.size = d_model
         self.self_attn = self_attn
         self.src_attn = src_attn
-        self.feed_forward = feed_forward
+        self.ff = ff
         self.dropout = nn.Dropout(dropout_prob)
         self.norm_self_attn = nn.LayerNorm(d_model)
         if self.src_attn is not None:
@@ -100,7 +103,7 @@ class TransformerLayer(nn.Module):
         if self.is_save_ff_input:
             self.ff_input = z.clone()
 
-        ff = self.feed_forward(z)
+        ff = self.ff(z)
         x = x + self.dropout(ff)
         return x
 

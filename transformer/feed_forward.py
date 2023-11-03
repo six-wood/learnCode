@@ -2,10 +2,10 @@ import math
 import torch
 from torch import nn
 
-from labml_helpers import module
+from labml_helpers.module import Module
 
 
-class FeedForward(module):
+class FeedForward(Module):
     def __init__(
         self,
         d_model: int,
